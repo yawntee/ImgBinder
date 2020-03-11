@@ -52,8 +52,8 @@ var zip=getObj("pack");
 if(zip.files.length>0){
 getBytes(zip.files[0],function(zipByt){
         var imgName=/\.(.+?)$/.exec(img.files[0].name);
-        var zipName=/.+\./.exec(zip.files[0].name);
-        downloadfile(new Uint8Array(imgByt.concat(zipByt)).buffer,(zipName.length>0?zipName[0]:(zip.file[0].name+"."))+(imgName.length>1?imgName[1]:""));
+        var zipName=/(.+)\./.exec(zip.files[0].name);
+        downloadfile(new Uint8Array(imgByt.concat(zipByt)).buffer,(zipName.length>1?zipName[1]:zip.files[0].name)+"."+(imgName.length>1?imgName[1]:img.files[0].name));
 });
 }else{
 alert("请选择压缩包");
@@ -72,16 +72,16 @@ try{
 if(fileList.length>0){
   getBytes(fileList[0],function(arr){
   var index;
-          var fileName=/.+\.?/.exec(fileList[0].name);
+  var fileName=/(.+)\./.exec(fileList[0].name);
   if(getHexData(arr,arr.length-22,2)=="50 4B"&&(index=searchHexFromData(arr,"50 4B 03 04"))>-1){
 alert(index);
-    downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>0?fileName[0]:(fileList[0].name+"."))+"zip");
+    downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".zip");
     return;
   }else if(getHexData(arr,arr.length-1,1)=="00"&&(index=searchHexFromData(arr,"52 61 72 21 1A 07"))>-1) {
-     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>0?fileName[0]:(fileList[0].name+"."))+"rar");
+     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".rar");
     return;
   }else if(getHexData(arr,arr.length-2,2)=="00 00"&&(index=searchHexFromData(arr,"37 7A BC AF 27 1C"))>-1) {
-     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>0?fileName[0]:(fileList[0].name+"."))+"zip");
+     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".zip");
     return;
   }
   alert("未发现压缩包");
