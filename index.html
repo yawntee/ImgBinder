@@ -8,7 +8,49 @@
 </head>
 
 <body>
+<table rules='all' border='1'>
+<tr>
+<td>
+图片：
+</td>
+<td>
+<input type="file" id="img" align='right'/>
+</td>
+</tr>
+<tr>
+<td>
+压缩包：
+</td>
+<td>
+<input type="file" id="pack"/>
+</td>
+</tr>
+<tr>
+<td>
+<input type="button" onclick="pack()" value="打包"/>
+</td>
+</tr>
+</table>
+<br>
+<br>
+<table rules='all' border='1'>
+<tr>
+<td>
+解包：<input type="file" id="file" onchange="unpack(this);"/>
+</td>
+</tr>
+<tr>
+<td>
+压缩包查找进度：<progress id="progress" value="0" max="100"></progress>
+</td>
+</td>
+</table>
+<br>
+<br>
+<b><i>Tip:</i>手机只有在火狐(Firefox)或Chrome浏览器才能下载此网页的文件哦(´-ω-`)</b>
 <script>
+var progress=getObj("progress");
+
 function getObj(id){
 return document.getElementById(id);
 }
@@ -32,11 +74,7 @@ try{
   reader.readAsArrayBuffer(file);
   reader.onload = function(){
   var byts = new Uint8Array(this.result);
-  var bytarr = [];
-  for (var i = 0; i < byts.length; i++) {
-  bytarr.push(byts[i]);
-  }
-  callback(bytarr);
+  callback(byts);
   };
 }catch(err){
 document.write(err);
@@ -113,40 +151,5 @@ function getHexData(data,offset,length){
         return builder.substring(1);
 }
 </script>
-<table rules='all' border='1'>
-<tr>
-<td>
-图片：
-</td>
-<td>
-<input type="file" id="img" align='right'/>
-</td>
-</tr>
-<tr>
-<td>
-压缩包：
-</td>
-<td>
-<input type="file" id="pack"/>
-</td>
-</tr>
-<tr>
-<td colspan="2">
-<input type="button" onclick="pack()" value="打包"/>
-</td>
-</tr>
-</table>
-<br>
-<br>
-<table rules='all' border='1'>
-<tr>
-<td>
-解包：<input type="file" id="file" onchange="unpack(this);"/>
-</td>
-</tr>
-</table>
-<br>
-<br>
-<b><i>Tip:</i>手机只有在火狐(Firefox)或Chrome浏览器才能下载此网页的文件哦(´-ω-`)</b>
 </body>
 </html>
