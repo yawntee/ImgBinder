@@ -113,7 +113,7 @@ if(fileList.length>0){
      downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".rar");
     return;
   }else if(getHexData(arr,arr.length-2,2)=="00 00"&&(index=searchHexFromData(arr,"37 7A BC AF 27 1C"))>-1) {
-     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".zip");
+     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".7z");
     return;
   }
   alert("未发现压缩包");
