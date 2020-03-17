@@ -44,6 +44,7 @@
 <br>
 <b><i>Tip:</i>手机只有在火狐(Firefox)或Chrome浏览器才能下载此网页的文件哦(´-ω-`)</b>
 <script>
+var imgEnd=["FF D9","60 82","00 3B"];
 var progress=getObj("progress");
 
 function getObj(id){
@@ -99,6 +100,7 @@ alert("请选择图片");
 document.write(err);
 }
 }
+
 function unpack(obj){
 try{
   var fileList = obj.files;
@@ -106,13 +108,13 @@ if(fileList.length>0){
   getBytes(fileList[0],function(arr){
   var index;
   var fileName=/(.+)\./.exec(fileList[0].name);
-  if(getHexData(arr,arr.length-22,2)=="50 4B"&&(index=searchHexFromData(arr,"50 4B 03 04"))>-1){
+  if((index=searchHexFromData(arr,"50 4B 03 04"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1){
     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".zip");
     return;
-  }else if(getHexData(arr,arr.length-1,1)=="00"&&(index=searchHexFromData(arr,"52 61 72 21 1A 07"))>-1) {
+  }else if((index=searchHexFromData(arr,"52 61 72 21 1A 07"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1) {
      downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".rar");
     return;
-  }else if(getHexData(arr,arr.length-2,2)=="00 00"&&(index=searchHexFromData(arr,"37 7A BC AF 27 1C"))>-1) {
+  }else if((index=searchHexFromData(arr,"37 7A BC AF 27 1C"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1) {
      downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".7z");
     return;
   }
