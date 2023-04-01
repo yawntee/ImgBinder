@@ -1,151 +1,152 @@
-﻿<!--author github.com/digyth-->
+<!--author github.com/digyth-->
 <!--digyth copyright reserved-->
 <!doctype html>
 <html>
 <head>
-<meta charset="utf-8"/>
-<title>图种制作</title>
+    <meta charset="utf-8"/>
+    <title>图种制作</title>
+    <script src="download.js"></script>
 </head>
 
 <body>
-<table rules='all' border='1'>
-<tr>
-<td>
-图片：
-</td>
-<td>
-<input type="file" id="img" align='right'/>
-</td>
-</tr>
-<tr>
-<td>
-压缩包：
-</td>
-<td>
-<input type="file" id="pack"/>
-</td>
-</tr>
-<tr>
-<td colspan="2">
-<input type="button" onclick="pack()" value="打包"/>
-</td>
-</tr>
-</table>
-<br>
-<br>
-<table rules='all' border='1'>
-<tr>
-<td>
-解包：<input type="file" id="file" onchange="unpack(this);"/>
-</td>
-</tr>
-</table>
-<br>
-<br>
-<b><i>Tip:</i>手机只有在火狐(Firefox)或Chrome浏览器才能下载此网页的文件哦(´-ω-`)</b>
-<script>
-var imgEnd=["FF D9","60 82","00 3B"];
-var progress=getObj("progress");
+    <table rules='all' border='1'>
+        <tr>
+            <td>
+                图片：
+            </td>
+            <td>
+                <input type="file" id="img" align='right'/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                压缩包：
+            </td>
+            <td>
+                <input type="file" id="pack"/>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="button" onclick="pack()" value="打包"/>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br>
+    <table rules='all' border='1'>
+        <tr>
+            <td>
+                解包：<input type="file" id="file" onchange="unpack(this);"/>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br>
+    <script>
+        Uint8Array.prototype.concat=function(other){
+            var mergedArray = new Uint8Array(this.length + other.length);
+            mergedArray.set(this);
+            mergedArray.set(other, this.length);
+            return mergedArray;
+        }
 
-function getObj(id){
-return document.getElementById(id);
-}
 
-function downloadfile(buffer,fileName){
-        var blob=new Blob([buffer],{type:'application/octet-stream'});
-        if (window.navigator.msSaveOrOpenBlob) {
-            navigator.msSaveBlob(blob, fileName);
-        } else {
-            var link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = fileName;
-            link.click();
-            window.URL.revokeObjectURL(link.href);
-        }
-}
+        var imgEnd=["FF D9","60 82","00 3B"];
+        var progress=getObj("progress");
 
-function getBytes(file,callback){
-try{
-  var reader = new FileReader();
-  reader.readAsArrayBuffer(file);
-  reader.onload = function(){
-  var byts = new Uint8Array(this.result);
-  callback(byts);
-  };
-}catch(err){
-document.write(err);
-}
-}
+        function getObj(id){
+            return document.getElementById(id);
+        }
 
-function pack(){
-try{
-var img=getObj("img");
-if(img.files.length>0){
-getBytes(img.files[0],function(imgByt){
-var zip=getObj("pack");
-if(zip.files.length>0){
-getBytes(zip.files[0],function(zipByt){
-        var imgName=/\.(.+?)$/.exec(img.files[0].name);
-        var zipName=/(.+)\./.exec(zip.files[0].name);
-        downloadfile(new Uint8Array(imgByt.concat(zipByt)).buffer,(zipName.length>1?zipName[1]:zip.files[0].name)+"."+(imgName.length>1?imgName[1]:img.files[0].name));
-});
-}else{
-alert("请选择压缩包");
-}
-});
-}else{
-alert("请选择图片");
-}
-}catch(err){
-document.write(err);
-}
-}
+        function downloadfile(buffer,fileName){
+            console.log(buffer)
+            download(buffer,fileName);
+        }
 
-function unpack(obj){
-try{
-  var fileList = obj.files;
-if(fileList.length>0){
-  getBytes(fileList[0],function(arr){
-  var index;
-  var fileName=/(.+)\./.exec(fileList[0].name);
-  if((index=searchHexFromData(arr,"50 4B 03 04"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1){
-    downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".zip");
-    return;
-  }else if((index=searchHexFromData(arr,"52 61 72 21 1A 07"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1) {
-     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".rar");
-    return;
-  }else if((index=searchHexFromData(arr,"37 7A BC AF 27 1C"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1) {
-     downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".7z");
-    return;
-  }
-  alert("未发现压缩包");
- });
-}else{
-alert("请选择要解包的文件");
-}
-}catch(err){
-document.write(err);
-}
+        function getBytes(file,callback){
+            try{
+              var reader = new FileReader();
+              reader.readAsArrayBuffer(file);
+              reader.onload = function(){
+                  var byts = new Uint8Array(this.result);
+                  callback(byts);
+              };
+          }catch(err){
+            document.write(err);
+        }
+    }
+
+    function pack(){
+        try{
+            var img=getObj("img");
+            if(img.files.length>0){
+                getBytes(img.files[0],function(imgByt){
+                    var zip=getObj("pack");
+                    if(zip.files.length>0){
+                        getBytes(zip.files[0],function(zipByt){
+                            var imgName=/\.(.+?)$/.exec(img.files[0].name);
+                            var zipName=/(.+)\./.exec(zip.files[0].name);
+                            console.log(imgByt)
+                            downloadfile(new Uint8Array(imgByt.concat(zipByt)).buffer,(zipName.length>1?zipName[1]:zip.files[0].name)+"."+(imgName.length>1?imgName[1]:img.files[0].name));
+                        });
+                    }else{
+                        alert("请选择压缩包");
+                    }
+                });
+            }else{
+                alert("请选择图片");
+            }
+        }catch(err){
+            document.write(err);
+        }
+    }
+
+    function unpack(obj){
+        try{
+          var fileList = obj.files;
+          if(fileList.length>0){
+              getBytes(fileList[0],function(arr){
+                  var index;
+                  var fileName=/(.+)\./.exec(fileList[0].name);
+                  if((index=searchHexFromData(arr,"50 4B 03 04"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1){
+                    downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".zip");
+                    return;
+                }else if((index=searchHexFromData(arr,"52 61 72 21 1A 07"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1) {
+                   downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".rar");
+                   return;
+               }else if((index=searchHexFromData(arr,"37 7A BC AF 27 1C"))>-1&&imgEnd.indexOf(getHexData(arr,index-2,2))>-1) {
+                   downloadfile(new Uint8Array(arr.slice(index)).buffer,(fileName.length>1?fileName[1]:fileList[0].name)+".7z");
+                   return;
+               }
+               alert("未发现压缩包");
+           });
+          }else{
+            alert("请选择要解包的文件");
+        }
+    }catch(err){
+        document.write(err);
+    }
 }
 
 function searchHexFromData(bytes,hex){
-        var hexArr=hex.split(" ");
-        abc:for(var i=0;i<bytes.length;i++){
-            for(var j=0;j<hexArr.length;j++){
-                if(bytes[i+j]!=parseInt(hexArr[j],16))continue abc;
-            }
-            return i;
+    var hexArr=hex.split(" ");
+    abc:for(var i=0;i<bytes.length;i++){
+        for(var j=0;j<hexArr.length;j++){
+            if(bytes[i+j]!=parseInt(hexArr[j],16))continue abc;
         }
-        return -1;
+        return i;
+    }
+    return -1;
 }
 
 function getHexData(data,offset,length){
-        var builder="";
-        for (var i=0;i<length;i++){
-            var str=(data[offset+i]&0xff).toString(16);
-            builder+=" "+(str.length==2?str:"0"+str).toUpperCase();
-        }
-        return builder.substring(1);
+    var builder="";
+    for (var i=0;i<length;i++){
+        var str=(data[offset+i]&0xff).toString(16);
+        builder+=" "+(str.length==2?str:"0"+str).toUpperCase();
+    }
+    return builder.substring(1);
 }
 </script>
 </body>
